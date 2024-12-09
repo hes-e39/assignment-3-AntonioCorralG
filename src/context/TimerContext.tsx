@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { Timer, TimerContextType } from '../types/types';
+import { decodeTimers, encodeTimers } from '../utils/helpers';
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
@@ -10,9 +11,18 @@ export const TimerProvider = ({ children }: { children: any }) => {
     const [timers, setTimers] = useState<Timer[]>([]);
     const [currentTimerIndex, setCurrentTimerIndex] = useState(0);
     const [isWorkoutRunning, setIsWorkoutRunning] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+
 
     // check for saved state
     useEffect(() => {
+        // Load if params present
+        const encodedTimers = searchParams.get('timers');
+        if (encodedTimers) {
+            setTimers(decodeTimers(encodedTimers));
+            return;
+        }
+
         const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (savedState) {
             try {
@@ -24,7 +34,7 @@ export const TimerProvider = ({ children }: { children: any }) => {
                 console.error('Unable to retreieve saved state. :-/', error);
             }
         }
-    }, []);
+    }, [searchParams]);
 
     // Save state to local storage on changes
     useEffect(() => {
@@ -40,6 +50,10 @@ export const TimerProvider = ({ children }: { children: any }) => {
         const timeoutId = setTimeout(saveState, 1000);
         return () => clearTimeout(timeoutId);
     }, [timers, currentTimerIndex, isWorkoutRunning]);
+
+    const savingTimerURLS = () => {
+        setSearchParams({ timers: encodeTimers(timers) });
+    };
 
     const addTimer = (timer: Timer) => {
         setTimers(prevTimers => [...prevTimers, timer]);
@@ -103,7 +117,7 @@ export const TimerProvider = ({ children }: { children: any }) => {
 
     return (
         <TimerContext.Provider
-            value={{ timers, currentTimerIndex, isWorkoutRunning, addTimer, removeTimer, startWorkout, pauseWorkout, resetWorkout, fastForward, updateTimerState, updateTimerTimeLeft, nextTimer }}
+            value={{ timers, currentTimerIndex, isWorkoutRunning, addTimer, removeTimer, startWorkout, pauseWorkout, resetWorkout, fastForward, updateTimerState, updateTimerTimeLeft, nextTimer, savingTimerURLS }}
         >
             {children}
         </TimerContext.Provider>

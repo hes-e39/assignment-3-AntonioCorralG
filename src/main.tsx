@@ -1,11 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Link, Outlet, RouterProvider, createHashRouter } from "react-router-dom";
+import { Link, Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import { TimerProvider } from "./context/TimerContext";
 import TimersView from "./views/TimersView";
 import DocumentationView from "./views/DocumentationView";
 import AddTimer from "./views/AddTimer";
+import { ErrorPage } from "./views/ErrorPageView";
+
 
 const PageIndex = () => {
   return (
@@ -27,22 +29,32 @@ const PageIndex = () => {
   );
 };
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <PageIndex />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
         element: <TimersView />,
+        errorElement: <ErrorPage />,
+
+
       },
       {
         path: "/docs",
         element: <DocumentationView />,
+        errorElement: <ErrorPage />,
+
+
+
       },
       {
         path: "/add",
         element: <AddTimer />,
+        errorElement: <ErrorPage />,
+
       },
     ],
   },

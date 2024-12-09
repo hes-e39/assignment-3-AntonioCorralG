@@ -20,4 +20,5 @@ export interface TimerContextType {
     updateTimerState: (id: string, state: 'running' | 'notRunning' | 'completed') => void;
     updateTimerTimeLeft: (id: string, timeLeft: number) => void;
     nextTimer: () => void;
+    savingTimerURLS: () => void;
 }

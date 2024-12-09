@@ -1,7 +1,4 @@
-// Add helpers here. This is usually code that is just JS and not React code. Example: write a function that
-// calculates number of minutes when passed in seconds. Things of this nature that you don't want to copy/paste
-// everywhere.
-
+import type { Timer } from "../types/types";
 
 export const formatTime = (milliseconds: number) => {
     const hours = Math.floor(milliseconds / 3600000);
@@ -9,9 +6,18 @@ export const formatTime = (milliseconds: number) => {
     const seconds = Math.floor((milliseconds % 60000) / 1000);
     const centiseconds = Math.floor((milliseconds % 1000) / 10);
 
-    return `${hours > 0 ? `${hours.toString().padStart(2, "0")}:` : ""}${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}.${centiseconds
-      .toString()
-      .padStart(2, "0")}`;
-  };
+    return `${hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''}${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+};
+
+export const encodeTimers = (timers: Timer[]): string => {
+    return encodeURIComponent(JSON.stringify(timers));
+};
+
+export const decodeTimers = (encoded: string): Timer[] => {
+    try {
+        return JSON.parse(decodeURIComponent(encoded));
+    } catch (error) {
+        console.error('Failed to decode timers:', error);
+        return [];
+    }
+};
