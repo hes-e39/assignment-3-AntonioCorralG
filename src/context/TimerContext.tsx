@@ -47,12 +47,16 @@ export const TimerProvider = ({ children }: { children: any }) => {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
         };
 
-        const timeoutId = setTimeout(saveState, 1000);
-        return () => clearTimeout(timeoutId);
+        if (timers.length > 0) {
+            const timeoutId = setTimeout(saveState, 1000);
+            return () => clearTimeout(timeoutId);
+        }
     }, [timers, currentTimerIndex, isWorkoutRunning]);
 
     const savingTimerURLS = () => {
-        setSearchParams({ timers: encodeTimers(timers) });
+        if (timers.length > 0) {
+            setSearchParams({ timers: encodeTimers(timers) });
+        }
     };
 
     const addTimer = (timer: Timer) => {
@@ -66,6 +70,7 @@ export const TimerProvider = ({ children }: { children: any }) => {
             setCurrentTimerIndex(Math.max(0, currentTimerIndex - 1));
         }
     };
+
     const startWorkout = () => {
         setIsWorkoutRunning(true);
         if (timers.length > 0) {

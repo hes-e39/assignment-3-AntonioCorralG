@@ -8,24 +8,25 @@ import DocumentationView from "./views/DocumentationView";
 import AddTimer from "./views/AddTimer";
 import { ErrorPage } from "./views/ErrorPageView";
 
-
 const PageIndex = () => {
   return (
-    <div>
-      <h1>Assignment</h1>
-      <ul>
-        <li>
-          <Link to="/">Timers</Link>
-        </li>
-        <li>
-          <Link to="/docs">Documentation</Link>
-        </li>
-        <li>
-          <Link to="/add">Add Timer</Link>
-        </li>
-      </ul>
-      <Outlet />
-    </div>
+    <TimerProvider>
+      <div>
+        <h1>Assignment</h1>
+        <ul>
+          <li>
+            <Link to="/">Timers</Link>
+          </li>
+          <li>
+            <Link to="/docs">Documentation</Link>
+          </li>
+          <li>
+            <Link to="/add">Add Timer</Link>
+          </li>
+        </ul>
+        <Outlet />
+      </div>
+    </TimerProvider>
   );
 };
 
@@ -39,22 +40,16 @@ const router = createBrowserRouter([
         index: true,
         element: <TimersView />,
         errorElement: <ErrorPage />,
-
-
       },
       {
         path: "/docs",
         element: <DocumentationView />,
         errorElement: <ErrorPage />,
-
-
-
       },
       {
         path: "/add",
         element: <AddTimer />,
         errorElement: <ErrorPage />,
-
       },
     ],
   },
@@ -62,8 +57,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <TimerProvider>
-      <RouterProvider router={router} />
-    </TimerProvider>
+    <RouterProvider router={router} />
   </StrictMode>
 );
