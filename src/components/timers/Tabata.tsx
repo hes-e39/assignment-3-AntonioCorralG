@@ -6,7 +6,7 @@ import {
   StyledButtonContainer,
   TimerDisplay,
   TimerContainer,
-  DisplayRounds
+  DisplayRounds, TimerDescription
 } from "../generic/ContainerDisplays";
 
 import { formatTime } from "../../utils/helpers";
@@ -61,6 +61,8 @@ const Tabata = ({ id }: { id: string }) => {
   return (
     <TimerContainer>
       <TimerDisplay>{formatTime(timeLeft)}</TimerDisplay>
+      <TimerDescription>{timer.description}</TimerDescription>
+
       <div>{phase ? "Work" : "Rest"}</div>
       <DisplayRounds>Rounds Remaining: {roundsLeft}</DisplayRounds>
       <StyledButtonContainer>

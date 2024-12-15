@@ -5,6 +5,7 @@ export interface Timer {
     state: 'running' | 'notRunning' | 'completed';
     timeLeft: number;
     currentRound?: number;
+    description: string; 
 }
 
 export interface TimerContextType {

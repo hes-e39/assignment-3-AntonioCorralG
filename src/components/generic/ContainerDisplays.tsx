@@ -65,4 +65,8 @@ export const FormContainer = styled.div`
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 `;
 
-
+export const TimerDescription = styled.div`
+  font-size: 1.2rem;
+  color: #666;
+  margin-top: 0.5rem;
+`;

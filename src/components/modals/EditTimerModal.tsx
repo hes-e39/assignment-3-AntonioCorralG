@@ -14,13 +14,18 @@ interface EditTimerModalProps {
 const EditTimerModal: React.FC<EditTimerModalProps> = ({ timer, onClose }) => {
     const { setTimersState, savingTimerURLS, timers } = useTimers();
     const [config, setConfig] = useState(timer.config);
+    const [description, setDescription] = useState(timer.description);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setConfig({ ...config, [event.target.name]: Number(event.target.value) });
     };
 
+    const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setDescription(event.target.value);
+    };
+
     const handleSaveClick = () => {
-        const updatedTimers = timers.map(t => (t.id === timer.id ? { ...t, config } : t));
+        const updatedTimers = timers.map(t => (t.id === timer.id ? { ...t, config, description } : t));
         setTimersState(updatedTimers);
         savingTimerURLS();
         onClose();
@@ -134,6 +139,16 @@ const EditTimerModal: React.FC<EditTimerModalProps> = ({ timer, onClose }) => {
                                 </StyledLabel>
                             </>
                         )}
+                        <StyledLabel>
+                            Description:
+                            <input
+                                name="description"
+                                type="text"
+                                placeholder="Description"
+                                value={description}
+                                onChange={handleDescriptionChange}
+                            />
+                        </StyledLabel>
                         <StyledButtonContainer>
                             <Button type="button" height={40} width={100} onClick={onClose}>
                                 Cancel

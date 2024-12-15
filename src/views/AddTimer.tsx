@@ -15,6 +15,7 @@ const AddTimerView = () => {
 
     const [type, setType] = useState("stopwatch");
     const [config, setConfig] = useState<any>({ hours: 0, minutes: 0, seconds: 0, numberOfRounds: 1 });
+    const [description, setDescription] = useState("");
 
     const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setType(event.target.value);
@@ -23,6 +24,10 @@ const AddTimerView = () => {
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setConfig({ ...config, [event.target.name]: Number(event.target.value) });
+    };
+
+    const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setDescription(event.target.value);
     };
 
     const handleSubmit = (event: React.FormEvent) => {
@@ -38,6 +43,7 @@ const AddTimerView = () => {
                 : { ...config, initialTime: type === "stopwatch" ? 0 : totalTime },
             state: "notRunning",
             timeLeft: type === "stopwatch" ? 0 : type === "tabata" ? config.workTime * 1000 : totalTime,
+            description,
         };
         addTimer(newTimer);
         navigate("/");
@@ -105,8 +111,17 @@ const AddTimerView = () => {
                         </StyledLabel>
                     </>
                 )}
+                <StyledLabel>
+                    Description:
+                    <input
+                        name="description"
+                        type="text"
+                        placeholder="Description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                    />
+                </StyledLabel>
                 <StyledButtonContainer>
-
                     <Button
                         type="submit"
                         height={40}

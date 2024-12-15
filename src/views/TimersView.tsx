@@ -96,7 +96,7 @@ const TimersView = () => {
                 <Button height={60} type="submit" width={70} onClick={fastForward}>
                     Fast Forward
                 </Button>
-                <Button height={60} type="submit" width={70} onClick={() => (location.href = '/#/add')}>
+                <Button height={60} type="submit" width={70} onClick={() => (location.href = '/add')}>
                     Add Timer
                 </Button>
                 <Button type="button" height={60} width={120} onClick={savingTimerURLS}>

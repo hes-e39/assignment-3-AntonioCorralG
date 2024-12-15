@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTimers } from "../../context/TimerContext";
 import Button from "../generic/Button";
-import { StyledButtonContainer, TimerDisplay, TimerContainer } from "../generic/ContainerDisplays";
+import { StyledButtonContainer, TimerDisplay, TimerContainer, TimerDescription } from "../generic/ContainerDisplays";
 import { formatTime } from "../../utils/helpers";
 
 const Stopwatch = ({ id }: { id: string }) => {
@@ -39,6 +39,8 @@ const Stopwatch = ({ id }: { id: string }) => {
   return (
     <TimerContainer>
       <TimerDisplay>{formatTime(timeLeft)}</TimerDisplay>
+      <TimerDescription>{timer.description}</TimerDescription>
+
       <StyledButtonContainer>
         <Button
           type="remove"
