@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTimers } from '../context/TimerContext';
 import Stopwatch from '../components/timers/Stopwatch';
 import Countdown from '../components/timers/Countdown';
@@ -9,9 +9,10 @@ import { TimerContainer } from '../components/generic/ContainerDisplays';
 import Button from '../components/generic/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPause, faPlay, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { TimerStyle } from '../components/generic/FormStyling';
+import { TimerStyle, TotalTimeDisplay } from '../components/generic/FormStyling';
 import { ButtonContainer, StyledButtonContainer } from '../components/generic/ContainerDisplays';
 import EditTimerModal from '../components/modals/EditTimerModal';
+import { calculateTotalTime, formatTime } from '../utils/helpers';
 
 
 
@@ -19,6 +20,39 @@ const TimersView = () => {
     const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS } = useTimers();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTimer, setEditingTimer] = useState<Timer | null>(null);
+    const [totalTime, setTotalTime] = useState(() => calculateTotalTime(timers));
+    const [timeLeft, setTimeLeft] = useState(totalTime);
+    const intervalRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        setTotalTime(calculateTotalTime(timers));
+    }, [timers]);
+
+    useEffect(() => {
+        setTimeLeft(totalTime);
+    }, [totalTime]);
+
+    useEffect(() => {
+        if (isWorkoutRunning) {
+            intervalRef.current = window.setInterval(() => {
+                setTimeLeft(prevTime => {
+                    if (prevTime <= 1000) {
+                        pauseWorkout();
+                        clearInterval(intervalRef.current!);
+                        return 0;
+                    }
+                    return prevTime - 1000;
+                });
+            }, 1000);
+        } else if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+    }, [isWorkoutRunning]);
 
     const renderTimer = (timer: Timer) => {
         switch (timer.type) {
@@ -48,11 +82,15 @@ const TimersView = () => {
     return (
         <>
             <h2>Timers</h2>
+            <TotalTimeDisplay>{`Total Workout Time: ${formatTime(timeLeft)}`}</TotalTimeDisplay>
             <ButtonContainer>
                 <Button type={isWorkoutRunning ? 'pause' : 'start'} height={75} width={200} onClick={isWorkoutRunning ? pauseWorkout : startWorkout}>
                     <FontAwesomeIcon icon={isWorkoutRunning ? faPause : faPlay} size="3x" color={isWorkoutRunning ? '#3E535C' : '#b8bebf'} />{' '}
                 </Button>
-                <Button type="reset" height={60} width={70} onClick={resetWorkout}>
+                <Button type="reset" height={60} width={70} onClick={() => {
+                    resetWorkout();
+                    setTimeLeft(totalTime);
+                }}>
                     Reset
                 </Button>
                 <Button height={60} type="submit" width={70} onClick={fastForward}>

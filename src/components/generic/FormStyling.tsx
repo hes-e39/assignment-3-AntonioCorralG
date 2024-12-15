@@ -25,3 +25,10 @@ export const TimerStyle = styled.div`
   margin: 10px;
   font-size: 1.5rem;
 `;
+
+export const TotalTimeDisplay = styled.div`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #333;
+`;

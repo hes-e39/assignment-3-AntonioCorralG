@@ -21,3 +21,20 @@ export const decodeTimers = (encoded: string): Timer[] => {
         return [];
     }
 };
+
+
+export const calculateTotalTime = (timers: Timer[]): number => {
+    return timers.reduce((total, timer) => {
+        switch (timer.type) {
+            case "countdown":
+            case "stopwatch":
+                return total + timer.config.hours * 3600000 + timer.config.minutes * 60000 + timer.config.seconds * 1000;
+            case "xy":
+                return total + (timer.config.minutes * 60 + timer.config.seconds) * timer.config.numberOfRounds * 1000;
+            case "tabata":
+                return total + (timer.config.workTime + timer.config.restTime) * timer.config.numberOfRounds * 1000;
+            default:
+                return total;
+        }
+    }, 0);
+};
