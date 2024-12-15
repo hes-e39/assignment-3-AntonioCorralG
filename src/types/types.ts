@@ -21,4 +21,5 @@ export interface TimerContextType {
     updateTimerTimeLeft: (id: string, timeLeft: number) => void;
     nextTimer: () => void;
     savingTimerURLS: () => void;
+    setTimersState: (newTimers: Timer[]) => void;
 }

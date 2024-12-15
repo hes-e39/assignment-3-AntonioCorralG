@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { Timer, TimerContextType } from '../types/types';
 import { decodeTimers, encodeTimers } from '../utils/helpers';
@@ -7,8 +7,8 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'workoutTimerState';
 
-export const TimerProvider = ({ children }: { children: any }) => {
-    const [timers, setTimers] = useState<Timer[]>([]);
+export const TimerProvider = ({ children }: { children: ReactNode }) => {
+    const [timers, setTimersState] = useState<Timer[]>([]);
     const [currentTimerIndex, setCurrentTimerIndex] = useState(0);
     const [isWorkoutRunning, setIsWorkoutRunning] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -19,7 +19,7 @@ export const TimerProvider = ({ children }: { children: any }) => {
         // Load if params present
         const encodedTimers = searchParams.get('timers');
         if (encodedTimers) {
-            setTimers(decodeTimers(encodedTimers));
+            setTimersState(decodeTimers(encodedTimers));
             return;
         }
 
@@ -27,7 +27,7 @@ export const TimerProvider = ({ children }: { children: any }) => {
         if (savedState) {
             try {
                 const { timers, currentTimerIndex, isWorkoutRunning } = JSON.parse(savedState);
-                setTimers(timers);
+                setTimersState(timers);
                 setCurrentTimerIndex(currentTimerIndex);
                 setIsWorkoutRunning(isWorkoutRunning);
             } catch (error) {
@@ -53,19 +53,21 @@ export const TimerProvider = ({ children }: { children: any }) => {
         }
     }, [timers, currentTimerIndex, isWorkoutRunning]);
 
+    const setTimers = (newTimers: Timer[]) => {
+        setTimersState(newTimers);
+    };
+
     const savingTimerURLS = () => {
-        if (timers.length > 0) {
-            setSearchParams({ timers: encodeTimers(timers) });
-        }
+        setSearchParams({ timers: encodeTimers(timers) });
     };
 
     const addTimer = (timer: Timer) => {
-        setTimers(prevTimers => [...prevTimers, timer]);
+        setTimersState(prevTimers => [...prevTimers, timer]);
     };
 
     const removeTimer = (id: string) => {
         const updatedTimers = timers.filter(timer => timer.id !== id);
-        setTimers(updatedTimers);
+        setTimersState(updatedTimers);
         if (currentTimerIndex >= updatedTimers.length) {
             setCurrentTimerIndex(Math.max(0, currentTimerIndex - 1));
         }
@@ -74,19 +76,21 @@ export const TimerProvider = ({ children }: { children: any }) => {
     const startWorkout = () => {
         setIsWorkoutRunning(true);
         if (timers.length > 0) {
-            setTimers(prevTimers => prevTimers.map((timer, index) => (index === currentTimerIndex ? { ...timer, state: 'running' } : timer)));
+            setTimersState(prevTimers => prevTimers.map((timer, index) =>
+                (index === currentTimerIndex ? { ...timer, state: 'running' } : timer)));
         }
     };
 
     const pauseWorkout = () => {
         setIsWorkoutRunning(false);
-        setTimers(prevTimers => prevTimers.map(timer => (timer.state === 'running' ? { ...timer, state: 'notRunning' } : timer)));
+        setTimersState(prevTimers => prevTimers.map(timer =>
+            (timer.state === 'running' ? { ...timer, state: 'notRunning' } : timer)));
     };
 
     const resetWorkout = () => {
         setCurrentTimerIndex(0);
         setIsWorkoutRunning(false);
-        setTimers(prevTimers =>
+        setTimersState(prevTimers =>
             prevTimers.map(timer => ({
                 ...timer,
                 state: 'notRunning',
@@ -101,11 +105,11 @@ export const TimerProvider = ({ children }: { children: any }) => {
     };
 
     const updateTimerState = (id: string, state: 'running' | 'notRunning' | 'completed') => {
-        setTimers(prevTimers => prevTimers.map(timer => (timer.id === id ? { ...timer, state } : timer)));
+        setTimersState(prevTimers => prevTimers.map(timer => (timer.id === id ? { ...timer, state } : timer)));
     };
 
     const updateTimerTimeLeft = (id: string, timeLeft: number) => {
-        setTimers(prevTimers => prevTimers.map(timer => (timer.id === id ? { ...timer, timeLeft } : timer)));
+        setTimersState(prevTimers => prevTimers.map(timer => (timer.id === id ? { ...timer, timeLeft } : timer)));
     };
 
     const nextTimer = () => {
@@ -113,7 +117,8 @@ export const TimerProvider = ({ children }: { children: any }) => {
         if (nextIndex < timers.length) {
             setCurrentTimerIndex(nextIndex);
             setIsWorkoutRunning(true);
-            setTimers(prevTimers => prevTimers.map((timer, index) => (index === nextIndex ? { ...timer, state: 'running' } : timer)));
+            setTimersState(prevTimers => prevTimers.map((timer, index) =>
+                (index === nextIndex ? { ...timer, state: 'running' } : timer)));
         } else {
             setCurrentTimerIndex(0);
             setIsWorkoutRunning(false);
@@ -122,7 +127,22 @@ export const TimerProvider = ({ children }: { children: any }) => {
 
     return (
         <TimerContext.Provider
-            value={{ timers, currentTimerIndex, isWorkoutRunning, addTimer, removeTimer, startWorkout, pauseWorkout, resetWorkout, fastForward, updateTimerState, updateTimerTimeLeft, nextTimer, savingTimerURLS }}
+            value={{
+                timers,
+                currentTimerIndex,
+                isWorkoutRunning,
+                addTimer,
+                removeTimer,
+                startWorkout,
+                pauseWorkout,
+                resetWorkout,
+                fastForward,
+                updateTimerState,
+                updateTimerTimeLeft,
+                nextTimer,
+                savingTimerURLS,
+                setTimersState, // Ensure setTimers function is included in the context value
+            }}
         >
             {children}
         </TimerContext.Provider>

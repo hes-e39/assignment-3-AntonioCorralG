@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTimers } from '../context/TimerContext';
 import Stopwatch from '../components/timers/Stopwatch';
 import Countdown from '../components/timers/Countdown';
@@ -7,12 +8,17 @@ import type { Timer } from '../types/types';
 import { TimerContainer } from '../components/generic/ContainerDisplays';
 import Button from '../components/generic/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faPause, faPlay, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { TimerStyle } from '../components/generic/FormStyling';
-import { ButtonContainer } from '../components/generic/ContainerDisplays';
+import { ButtonContainer, StyledButtonContainer } from '../components/generic/ContainerDisplays';
+import EditTimerModal from '../components/modals/EditTimerModal';
+
+
 
 const TimersView = () => {
     const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS } = useTimers();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTimer, setEditingTimer] = useState<Timer | null>(null);
 
     const renderTimer = (timer: Timer) => {
         switch (timer.type) {
@@ -29,6 +35,16 @@ const TimersView = () => {
         }
     };
 
+    const handleEditClick = (timer: Timer) => {
+        setEditingTimer(timer);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingTimer(null);
+    };
+
     return (
         <>
             <h2>Timers</h2>
@@ -42,7 +58,7 @@ const TimersView = () => {
                 <Button height={60} type="submit" width={70} onClick={fastForward}>
                     Fast Forward
                 </Button>
-                <Button height={60} type="submit" width={70} onClick={() => (location.href = '/add')}>
+                <Button height={60} type="submit" width={70} onClick={() => (location.href = '/#/add')}>
                     Add Timer
                 </Button>
                 <Button type="button" height={60} width={120} onClick={savingTimerURLS}>
@@ -54,9 +70,22 @@ const TimersView = () => {
                     <TimerStyle key={`timer-${timer.id}`} style={{ opacity: index === currentTimerIndex ? 1 : 0.5 }}>
                         <div>{timer.type}</div>
                         {renderTimer(timer)}
+                        <StyledButtonContainer>
+                            <Button
+                                type="edit"
+                                height={60}
+                                width={70}
+                                onClick={() => handleEditClick(timer)}
+                            >
+                                <FontAwesomeIcon icon={faEdit} size="2x" />
+                            </Button>
+                        </StyledButtonContainer>
                     </TimerStyle>
                 ))}
             </TimerContainer>
+            {isModalOpen && editingTimer && (
+                <EditTimerModal timer={editingTimer} onClose={handleCloseModal} />
+            )}
         </>
     );
 };
