@@ -12,7 +12,7 @@ interface EditTimerModalProps {
 }
 
 const EditTimerModal: React.FC<EditTimerModalProps> = ({ timer, onClose }) => {
-    const { setTimersState, savingTimerURLS, timers } = useTimers();
+    const { setTimers, savingTimerURLS, timers } = useTimers();
     const [config, setConfig] = useState(timer.config);
     const [description, setDescription] = useState(timer.description);
 
@@ -26,7 +26,7 @@ const EditTimerModal: React.FC<EditTimerModalProps> = ({ timer, onClose }) => {
 
     const handleSaveClick = () => {
         const updatedTimers = timers.map(t => (t.id === timer.id ? { ...t, config, description } : t));
-        setTimersState(updatedTimers);
+        setTimers(updatedTimers);
         savingTimerURLS();
         onClose();
     };

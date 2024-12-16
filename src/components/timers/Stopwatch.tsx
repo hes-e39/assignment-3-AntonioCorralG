@@ -19,19 +19,20 @@ const Stopwatch = ({ id }: { id: string }) => {
 
   useEffect(() => {
     if (isRunning && timeLeft < targetTime) {
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = window.setInterval(() => {
         updateTimerTimeLeft(id, timeLeft + 10);
       }, 10);
     } else if (isRunning && timeLeft >= targetTime) {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
-      } updateTimerState(id, "completed");
+        clearInterval(intervalRef.current);
+      }
+      updateTimerState(id, "completed");
       nextTimer();
     }
 
     return () => {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
+        clearInterval(intervalRef.current);
       }
     };
   }, [isRunning, timeLeft, targetTime]);
@@ -40,7 +41,6 @@ const Stopwatch = ({ id }: { id: string }) => {
     <TimerContainer>
       <TimerDisplay>{formatTime(timeLeft)}</TimerDisplay>
       <TimerDescription>{timer.description}</TimerDescription>
-
       <StyledButtonContainer>
         <Button
           type="remove"

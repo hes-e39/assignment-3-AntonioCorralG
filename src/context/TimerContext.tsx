@@ -7,58 +7,104 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'workoutTimerState';
 
+const totalWorkoutTimeCalc = (timers: Timer[]): number => {
+    return timers.reduce((total, timer) => {
+        if (timer.state !== 'completed') { // Only include time for not completed timers
+            switch (timer.type) {
+                case "countdown":
+                case "stopwatch":
+                    return total + timer.config.hours * 3600000 + timer.config.minutes * 60000 + timer.config.seconds * 1000;
+                case "xy":
+                    return total + (timer.config.minutes * 60 + timer.config.seconds) * timer.config.numberOfRounds * 1000;
+                case "tabata":
+                    return total + (timer.config.workTime + timer.config.restTime) * timer.config.numberOfRounds * 1000;
+                default:
+                    return total;
+            }
+        }
+        return total;
+    }, 0);
+};
+
 export const TimerProvider = ({ children }: { children: ReactNode }) => {
     const [timers, setTimersState] = useState<Timer[]>([]);
     const [currentTimerIndex, setCurrentTimerIndex] = useState(0);
     const [isWorkoutRunning, setIsWorkoutRunning] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const [totalWorkoutTime, setTotalWorkoutTime] = useState(0);
 
+
+    useEffect(() => {
+        setTotalWorkoutTime(totalWorkoutTimeCalc(timers));
+    }, [timers]);
 
     // check for saved state
     useEffect(() => {
+        let didSetTimers = false;
         // Load if params present
         const encodedTimers = searchParams.get('timers');
         if (encodedTimers) {
             setTimersState(decodeTimers(encodedTimers));
-            return;
+            didSetTimers = true;
         }
 
-        const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedState) {
-            try {
-                const { timers, currentTimerIndex, isWorkoutRunning } = JSON.parse(savedState);
-                setTimersState(timers);
-                setCurrentTimerIndex(currentTimerIndex);
-                setIsWorkoutRunning(isWorkoutRunning);
-            } catch (error) {
-                console.error('Unable to retreieve saved state. :-/', error);
+        if (!didSetTimers) {
+            const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedState) {
+                try {
+                    const { timers, currentTimerIndex, isWorkoutRunning, totalWorkoutTime } = JSON.parse(savedState);
+                    setTimersState(timers);
+                    setCurrentTimerIndex(currentTimerIndex);
+                    setIsWorkoutRunning(isWorkoutRunning);
+                    setTotalWorkoutTime(totalWorkoutTime);
+                } catch (error) {
+                    console.error('Unable to retreieve saved state. :-/', error);
+                }
             }
         }
     }, [searchParams]);
 
-    // Save state to local storage on changes
-    useEffect(() => {
-        const saveState = () => {
-            const state = {
-                timers,
-                currentTimerIndex,
-                isWorkoutRunning,
-            };
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    const saveState = () => {
+        const state = {
+            timers,
+            currentTimerIndex,
+            isWorkoutRunning,
+            totalWorkoutTime,
         };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    };
 
-        if (timers.length > 0) {
-            const timeoutId = setTimeout(saveState, 1000);
-            return () => clearTimeout(timeoutId);
-        }
-    }, [timers, currentTimerIndex, isWorkoutRunning]);
+    useEffect(() => {
+        const timeoutId = setTimeout(saveState, 1000);
+        return () => clearTimeout(timeoutId);
+    }, [timers, currentTimerIndex, isWorkoutRunning, totalWorkoutTime]);
+
+
+
+    const fastForward = () => {
+        setTimersState(prevTimers => {
+            const updatedTimers: Timer[] = prevTimers.map((timer, index) => {
+                if (index === currentTimerIndex) {
+                    return { ...timer, state: 'completed', timeLeft: 0 };
+                }
+                return timer;
+            });
+
+            setTotalWorkoutTime(totalWorkoutTimeCalc(updatedTimers));
+
+            return updatedTimers;
+        });
+        nextTimer();
+    };
 
     const setTimers = (newTimers: Timer[]) => {
         setTimersState(newTimers);
     };
 
     const savingTimerURLS = () => {
-        setSearchParams({ timers: encodeTimers(timers) });
+        if (timers.length > 0) {
+            setSearchParams({ timers: encodeTimers(timers) });
+        }
     };
 
     const addTimer = (timer: Timer) => {
@@ -96,12 +142,9 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
                 state: 'notRunning',
                 timeLeft: timer.type === 'stopwatch' ? 0 : timer.config.initialTime || 0,
                 currentRound: timer.type === 'xy' ? timer.config.numberOfRounds : undefined,
-            })),
+            }))
         );
-    };
-
-    const fastForward = () => {
-        nextTimer();
+        setTotalWorkoutTime(totalWorkoutTimeCalc(timers));
     };
 
     const updateTimerState = (id: string, state: 'running' | 'notRunning' | 'completed') => {
@@ -113,16 +156,23 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const nextTimer = () => {
-        const nextIndex = currentTimerIndex + 1;
-        if (nextIndex < timers.length) {
-            setCurrentTimerIndex(nextIndex);
-            setIsWorkoutRunning(true);
-            setTimersState(prevTimers => prevTimers.map((timer, index) =>
-                (index === nextIndex ? { ...timer, state: 'running' } : timer)));
-        } else {
-            setCurrentTimerIndex(0);
-            setIsWorkoutRunning(false);
-        }
+        setTimersState(prevTimers => {
+            const nextIndex = currentTimerIndex + 1;
+            if (nextIndex < prevTimers.length) {
+                setCurrentTimerIndex(nextIndex);
+                setIsWorkoutRunning(true);
+                return prevTimers.map((timer, index) => {
+                    if (index === nextIndex) {
+                        return { ...timer, state: 'running' };
+                    }
+                    return timer;
+                });
+            } else {
+                setCurrentTimerIndex(0);
+                setIsWorkoutRunning(false);
+                return prevTimers;
+            }
+        });
     };
 
     return (
@@ -141,7 +191,8 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
                 updateTimerTimeLeft,
                 nextTimer,
                 savingTimerURLS,
-                setTimersState, // Ensure setTimers function is included in the context value
+                setTimers,
+                totalWorkoutTime,
             }}
         >
             {children}

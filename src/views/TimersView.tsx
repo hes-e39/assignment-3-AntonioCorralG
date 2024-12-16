@@ -12,25 +12,18 @@ import { faPause, faPlay, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { TimerStyle, TotalTimeDisplay } from '../components/generic/FormStyling';
 import { ButtonContainer, StyledButtonContainer } from '../components/generic/ContainerDisplays';
 import EditTimerModal from '../components/modals/EditTimerModal';
-import { calculateTotalTime, formatTime } from '../utils/helpers';
-
-
+import { formatTime } from '../utils/helpers';
 
 const TimersView = () => {
-    const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS } = useTimers();
+    const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS, totalWorkoutTime } = useTimers();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTimer, setEditingTimer] = useState<Timer | null>(null);
-    const [totalTime, setTotalTime] = useState(() => calculateTotalTime(timers));
-    const [timeLeft, setTimeLeft] = useState(totalTime);
+    const [timeLeft, setTimeLeft] = useState(totalWorkoutTime);
     const intervalRef = useRef<number | null>(null);
 
     useEffect(() => {
-        setTotalTime(calculateTotalTime(timers));
-    }, [timers]);
-
-    useEffect(() => {
-        setTimeLeft(totalTime);
-    }, [totalTime]);
+        setTimeLeft(totalWorkoutTime);
+    }, [totalWorkoutTime]);
 
     useEffect(() => {
         if (isWorkoutRunning) {
@@ -89,7 +82,7 @@ const TimersView = () => {
                 </Button>
                 <Button type="reset" height={60} width={70} onClick={() => {
                     resetWorkout();
-                    setTimeLeft(totalTime);
+                    setTimeLeft(totalWorkoutTime);
                 }}>
                     Reset
                 </Button>

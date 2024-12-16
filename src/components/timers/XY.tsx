@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useTimers } from "../../context/TimerContext";
-
 import Button from "../generic/Button";
 import { StyledButtonContainer, TimerDisplay, TimerContainer, TimerDescription } from "../generic/ContainerDisplays";
 import { formatTime } from "../../utils/helpers";
@@ -16,41 +15,41 @@ const XY = ({ id }: { id: string }) => {
 
   const initialTime = (minutes * 60 + seconds) * 1000;
   const [roundsLeft, setRoundsLeft] = useState<number>(numberOfRounds);
-  const timeLeft = timer.timeLeft === undefined ? initialTime : timer.timeLeft; // Default to initialTime if undefined
+  const timeLeft = timer.timeLeft === undefined ? initialTime : timer.timeLeft;
 
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-
     if (isRunning && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = window.setInterval(() => {
         updateTimerTimeLeft(id, timeLeft - 10);
       }, 10);
     } else if (isRunning && timeLeft <= 0 && roundsLeft > 1) {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
-      } setRoundsLeft((prevRounds) => prevRounds - 1);
+        clearInterval(intervalRef.current);
+      }
+      setRoundsLeft(roundsLeft - 1);
       updateTimerTimeLeft(id, initialTime);
     } else if (isRunning && timeLeft <= 0 && roundsLeft <= 1) {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
-      } updateTimerState(id, "completed");
+        clearInterval(intervalRef.current);
+      }
+      updateTimerState(id, "completed");
       nextTimer();
     }
 
     return () => {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
+        clearInterval(intervalRef.current);
       }
     };
   }, [isRunning, timeLeft, roundsLeft]);
 
-
   return (
     <TimerContainer>
       <TimerDisplay>{formatTime(timeLeft)}</TimerDisplay>
-      <TimerDescription>{timer.description}</TimerDescription>=
       <div>Rounds Remaining: {roundsLeft}</div>
+      <TimerDescription>{timer.description}</TimerDescription>
       <StyledButtonContainer>
         <Button
           type="remove"

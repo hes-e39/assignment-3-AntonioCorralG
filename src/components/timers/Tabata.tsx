@@ -1,14 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTimers } from "../../context/TimerContext";
-
 import Button from "../generic/Button";
-import {
-  StyledButtonContainer,
-  TimerDisplay,
-  TimerContainer,
-  DisplayRounds, TimerDescription
-} from "../generic/ContainerDisplays";
-
+import { StyledButtonContainer, TimerDisplay, TimerContainer, DisplayRounds, TimerDescription } from "../generic/ContainerDisplays";
 import { formatTime } from "../../utils/helpers";
 
 const Tabata = ({ id }: { id: string }) => {
@@ -29,31 +22,33 @@ const Tabata = ({ id }: { id: string }) => {
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
+      intervalRef.current = window.setInterval(() => {
         updateTimerTimeLeft(id, timeLeft - 10);
       }, 10);
     } else if (isRunning && timeLeft <= 0 && roundsLeft > 1) {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
-      } if (phase) {
+        clearInterval(intervalRef.current);
+      }
+      if (phase) {
         setPhase(false);
         updateTimerTimeLeft(id, initialRestTime);
       } else {
-        setRoundsLeft((prevRounds) => prevRounds - 1);
+        setRoundsLeft(roundsLeft - 1);
         setPhase(true);
         updateTimerTimeLeft(id, initialWorkTime);
       }
       updateTimerState(id, "running");
     } else if (isRunning && timeLeft <= 0 && roundsLeft <= 1) {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
-      } updateTimerState(id, "completed");
+        clearInterval(intervalRef.current);
+      }
+      updateTimerState(id, "completed");
       nextTimer();
     }
 
     return () => {
       if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current as number);
+        clearInterval(intervalRef.current);
       }
     };
   }, [isRunning, timeLeft, roundsLeft, phase]);
@@ -61,10 +56,9 @@ const Tabata = ({ id }: { id: string }) => {
   return (
     <TimerContainer>
       <TimerDisplay>{formatTime(timeLeft)}</TimerDisplay>
-      <TimerDescription>{timer.description}</TimerDescription>
-
       <div>{phase ? "Work" : "Rest"}</div>
       <DisplayRounds>Rounds Remaining: {roundsLeft}</DisplayRounds>
+      <TimerDescription>{timer.description}</TimerDescription>
       <StyledButtonContainer>
         <Button
           type="remove"
