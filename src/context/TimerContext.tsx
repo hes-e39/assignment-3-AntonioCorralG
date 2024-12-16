@@ -8,9 +8,9 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = 'workoutTimerState';
 
 const saveWorkoutToHistory = (workout: { timers: Timer[]; date: string; }) => {
-    const history = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+    const history = JSON.parse(localStorage.getItem('workoutHistory')) || [];
     history.push(workout);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(history));
+    localStorage.setItem('workoutHistory', JSON.stringify(history));
 };
 
 const totalWorkoutTimeCalc = (timers: Timer[]): number => {
@@ -109,8 +109,8 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
 
     const setTimers = (newTimers: Timer[]) => {
         setTimersState(newTimers);
+        savingTimerURLS(newTimers);
     };
-
     const savingTimerURLS = (updatedTimers: Timer[] = timers) => {
         if (updatedTimers.length > 0) {
             const encodedTimers = encodeTimers(updatedTimers);
@@ -119,9 +119,15 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
             }
         }
     };
+
     const addTimer = (timer: Timer) => {
-        setTimersState(prevTimers => [...prevTimers, timer]);
+        setTimersState(prevTimers => {
+            const newTimers = [...prevTimers, timer];
+            savingTimerURLS(newTimers);
+            return newTimers;
+        });
     };
+
 
     const removeTimer = (id: string) => {
         const updatedTimers = timers.filter(timer => timer.id !== id);

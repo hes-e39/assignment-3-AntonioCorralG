@@ -25,16 +25,21 @@ export const decodeTimers = (encoded: string): Timer[] => {
 
 export const calculateTotalTime = (timers: Timer[]): number => {
     return timers.reduce((total, timer) => {
+        let timeToAdd = 0;
         switch (timer.type) {
             case "countdown":
+                timeToAdd = timer.config.hours * 3600000 + timer.config.minutes * 60000 + timer.config.seconds * 1000;
+                break;
             case "stopwatch":
-                return total + timer.config.hours * 3600000 + timer.config.minutes * 60000 + timer.config.seconds * 1000;
+                timeToAdd = timer.config.hours * 3600000 + timer.config.minutes * 60000 + timer.config.seconds * 1000;
+                break;
             case "xy":
-                return total + (timer.config.minutes * 60 + timer.config.seconds) * timer.config.numberOfRounds * 1000;
+                timeToAdd = (timer.config.minutes * 60 + timer.config.seconds) * timer.config.numberOfRounds * 1000;
+                break;
             case "tabata":
-                return total + (timer.config.workTime + timer.config.restTime) * timer.config.numberOfRounds * 1000;
-            default:
-                return total;
+                timeToAdd = (timer.config.workTime + timer.config.restTime) * timer.config.numberOfRounds * 1000;
+                break;
         }
+        return total + Math.max(0, timeToAdd - timer.config.initialTime);
     }, 0);
 };
