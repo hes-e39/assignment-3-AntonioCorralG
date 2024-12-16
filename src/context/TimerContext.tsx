@@ -101,12 +101,14 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
         setTimersState(newTimers);
     };
 
-    const savingTimerURLS = () => {
-        if (timers.length > 0) {
-            setSearchParams({ timers: encodeTimers(timers) });
+    const savingTimerURLS = (updatedTimers: Timer[] = timers) => {
+        if (updatedTimers.length > 0) {
+            const encodedTimers = encodeTimers(updatedTimers);
+            if (encodedTimers !== searchParams.get('timers')) {
+                setSearchParams({ timers: encodedTimers });
+            }
         }
     };
-
     const addTimer = (timer: Timer) => {
         setTimersState(prevTimers => [...prevTimers, timer]);
     };
@@ -183,11 +185,11 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
                 const temp = updatedTimers[currentIndex - 1];
                 updatedTimers[currentIndex - 1] = updatedTimers[currentIndex];
                 updatedTimers[currentIndex] = temp;
+                savingTimerURLS(updatedTimers);
                 return updatedTimers;
             }
             return prevTimers;
         });
-        savingTimerURLS();
     };
 
     const moveTimerDown = (id: string) => {
@@ -198,11 +200,11 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
                 const temp = updatedTimers[currentIndex + 1];
                 updatedTimers[currentIndex + 1] = updatedTimers[currentIndex];
                 updatedTimers[currentIndex] = temp;
+                savingTimerURLS(updatedTimers);
                 return updatedTimers;
             }
             return prevTimers;
         });
-        savingTimerURLS();
     };
 
     return (
