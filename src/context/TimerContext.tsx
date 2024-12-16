@@ -67,8 +67,12 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
                     console.error('Unable to retreieve saved state. :-/', error);
                 }
             }
+        } else {
+            // Clear local storage if no timers present
+            localStorage.removeItem(LOCAL_STORAGE_KEY);
         }
     }, [searchParams]);
+
 
     const saveState = () => {
         const state = {
