@@ -175,6 +175,36 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
+    const moveTimerUp = (id: string) => {
+        setTimersState(prevTimers => {
+            const currentIndex = prevTimers.findIndex(timer => timer.id === id);
+            if (currentIndex > 0) {
+                const updatedTimers = [...prevTimers];
+                const temp = updatedTimers[currentIndex - 1];
+                updatedTimers[currentIndex - 1] = updatedTimers[currentIndex];
+                updatedTimers[currentIndex] = temp;
+                return updatedTimers;
+            }
+            return prevTimers;
+        });
+        savingTimerURLS();
+    };
+
+    const moveTimerDown = (id: string) => {
+        setTimersState(prevTimers => {
+            const currentIndex = prevTimers.findIndex(timer => timer.id === id);
+            if (currentIndex < prevTimers.length - 1) {
+                const updatedTimers = [...prevTimers];
+                const temp = updatedTimers[currentIndex + 1];
+                updatedTimers[currentIndex + 1] = updatedTimers[currentIndex];
+                updatedTimers[currentIndex] = temp;
+                return updatedTimers;
+            }
+            return prevTimers;
+        });
+        savingTimerURLS();
+    };
+
     return (
         <TimerContext.Provider
             value={{
@@ -193,6 +223,8 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
                 savingTimerURLS,
                 setTimers,
                 totalWorkoutTime,
+                moveTimerUp,
+                moveTimerDown
             }}
         >
             {children}

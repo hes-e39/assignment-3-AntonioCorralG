@@ -8,14 +8,15 @@ import type { Timer } from '../types/types';
 import { TimerContainer } from '../components/generic/ContainerDisplays';
 import Button from '../components/generic/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause, faPlay, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faPause, faPlay, faEdit, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { TimerStyle, TotalTimeDisplay } from '../components/generic/FormStyling';
 import { ButtonContainer, StyledButtonContainer } from '../components/generic/ContainerDisplays';
 import EditTimerModal from '../components/modals/EditTimerModal';
 import { formatTime } from '../utils/helpers';
 
+
 const TimersView = () => {
-    const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS, totalWorkoutTime } = useTimers();
+    const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS, totalWorkoutTime, moveTimerDown, moveTimerUp } = useTimers();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTimer, setEditingTimer] = useState<Timer | null>(null);
     const [timeLeft, setTimeLeft] = useState(totalWorkoutTime);
@@ -61,6 +62,15 @@ const TimersView = () => {
                 return null;
         }
     };
+
+    const handleMoveUpClick = (id: string) => {
+        moveTimerUp(id);
+    };
+
+    const handleMoveDownClick = (id: string) => {
+        moveTimerDown(id);
+    };
+
 
     const handleEditClick = (timer: Timer) => {
         setEditingTimer(timer);
@@ -109,6 +119,12 @@ const TimersView = () => {
                                 onClick={() => handleEditClick(timer)}
                             >
                                 <FontAwesomeIcon icon={faEdit} size="2x" />
+                            </Button>
+                            <Button type="button" height={40} width={40} onClick={() => handleMoveUpClick(timer.id)}>
+                                <FontAwesomeIcon icon={faArrowUp} />
+                            </Button>
+                            <Button type="button" height={40} width={40} onClick={() => handleMoveDownClick(timer.id)}>
+                                <FontAwesomeIcon icon={faArrowDown} />
                             </Button>
                         </StyledButtonContainer>
                     </TimerStyle>

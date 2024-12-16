@@ -24,4 +24,6 @@ export interface TimerContextType {
     savingTimerURLS: () => void;
     setTimers: (newTimers: Timer[]) => void;
     totalWorkoutTime: number;
+    moveTimerUp: (id: string) => void; 
+    moveTimerDown: (id: string) => void;
 }

@@ -12,7 +12,7 @@ interface EditTimerModalProps {
 }
 
 const EditTimerModal: React.FC<EditTimerModalProps> = ({ timer, onClose }) => {
-    const { setTimers, savingTimerURLS, timers } = useTimers();
+    const { setTimers, savingTimerURLS, timers, resetWorkout } = useTimers();
     const [config, setConfig] = useState(timer.config);
     const [description, setDescription] = useState(timer.description);
 
@@ -24,10 +24,28 @@ const EditTimerModal: React.FC<EditTimerModalProps> = ({ timer, onClose }) => {
         setDescription(event.target.value);
     };
 
+    // In EditTimerModal.tsx
     const handleSaveClick = () => {
-        const updatedTimers = timers.map(t => (t.id === timer.id ? { ...t, config, description } : t));
+        const updatedTimers = timers.map(t =>
+            t.id === timer.id
+                ? {
+                    ...t,
+                    config,
+                    description,
+                    timeLeft:
+                        t.type === 'stopwatch'
+                            ? 0
+                            : t.type === 'tabata'
+                                ? config.workTime * 1000
+                                : config.hours * 3600000 + config.minutes * 60000 + config.seconds * 1000,
+                    state: 'notRunning',
+                }
+                : t,
+        );
+
         setTimers(updatedTimers);
         savingTimerURLS();
+        resetWorkout(); // Reset the workout after editing
         onClose();
     };
 
