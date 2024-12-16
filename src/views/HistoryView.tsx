@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Timer } from '../types/types';
+import type { Timer } from '../types/types';
 import { formatTime } from '../utils/helpers';
 
 interface CompletedWorkout {

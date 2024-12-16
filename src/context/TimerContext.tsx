@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { Timer, TimerContextType } from '../types/types';
 import { decodeTimers, encodeTimers } from '../utils/helpers';
