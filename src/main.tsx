@@ -6,6 +6,7 @@ import { TimerProvider } from "./context/TimerContext";
 import TimersView from "./views/TimersView";
 import DocumentationView from "./views/DocumentationView";
 import AddTimer from "./views/AddTimer";
+import HistoryView from './views/HistoryView';
 import { ErrorPage } from "./views/ErrorPageView";
 
 const PageIndex = () => {
@@ -22,6 +23,9 @@ const PageIndex = () => {
           </li>
           <li>
             <Link to="/add">Add Timer</Link>
+          </li>
+          <li>
+            <Link to="/history">Workout History</Link>
           </li>
         </ul>
         <Outlet />
@@ -51,6 +55,12 @@ const router = createBrowserRouter([
         element: <AddTimer />,
         errorElement: <ErrorPage />,
       },
+      {
+        path: "/history",
+        element: <HistoryView />,
+        errorElement: <ErrorPage />,
+
+      }
     ],
   },
 ]);

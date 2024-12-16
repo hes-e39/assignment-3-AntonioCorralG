@@ -7,6 +7,12 @@ const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'workoutTimerState';
 
+const saveWorkoutToHistory = (workout: { timers: Timer[]; date: string; }) => {
+    const history = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+    history.push(workout);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(history));
+};
+
 const totalWorkoutTimeCalc = (timers: Timer[]): number => {
     return timers.reduce((total, timer) => {
         if (timer.state !== 'completed') { // Only include time for not completed timers
@@ -172,6 +178,11 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
             } else {
                 setCurrentTimerIndex(0);
                 setIsWorkoutRunning(false);
+                const completedWorkout = {
+                    timers: prevTimers,
+                    date: new Date().toISOString(),
+                };
+                saveWorkoutToHistory(completedWorkout);
                 return prevTimers;
             }
         });
