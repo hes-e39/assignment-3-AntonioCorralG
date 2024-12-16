@@ -22,18 +22,14 @@ const XY = ({ id }: { id: string }) => {
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = window.setInterval(() => {
-        updateTimerTimeLeft(id, timeLeft - 10);
-      }, 10);
+        updateTimerTimeLeft(id, timeLeft - 1000);
+      }, 1000);
     } else if (isRunning && timeLeft <= 0 && roundsLeft > 1) {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
+      clearInterval(intervalRef.current!);
       setRoundsLeft(roundsLeft - 1);
       updateTimerTimeLeft(id, initialTime);
     } else if (isRunning && timeLeft <= 0 && roundsLeft <= 1) {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
+      clearInterval(intervalRef.current!);
       updateTimerState(id, "completed");
       nextTimer();
     }

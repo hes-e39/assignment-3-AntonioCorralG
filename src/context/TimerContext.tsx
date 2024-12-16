@@ -179,24 +179,19 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
             if (nextIndex < prevTimers.length) {
                 setCurrentTimerIndex(nextIndex);
                 setIsWorkoutRunning(true);
-                return prevTimers.map((timer, index) => {
-                    if (index === nextIndex) {
-                        return { ...timer, state: 'running' };
-                    }
-                    return timer;
-                });
-            } else {
-                setCurrentTimerIndex(0);
-                setIsWorkoutRunning(false);
-                const completedWorkout = {
-                    timers: prevTimers,
-                    date: new Date().toISOString(),
-                };
-                saveWorkoutToHistory(completedWorkout);
+                updateTimerState(prevTimers[nextIndex].id, 'running');
                 return prevTimers;
+            } else {
+                setIsWorkoutRunning(false);
+                saveWorkoutToHistory({
+                    timers: prevTimers.map(timer => ({ ...timer, state: 'completed' })),
+                    date: new Date().toISOString()
+                });
+                return prevTimers.map(timer => ({ ...timer, state: 'completed' }));
             }
         });
     };
+
 
     const moveTimerUp = (id: string) => {
         setTimersState(prevTimers => {

@@ -1,13 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTimers } from "../../context/TimerContext";
-
 import Button from "../generic/Button";
-import {
-  StyledButtonContainer,
-  TimerDisplay,
-  TimerContainer,
-  TimerDescription
-} from "../generic/ContainerDisplays";
+import { StyledButtonContainer, TimerDisplay, TimerContainer, TimerDescription } from "../generic/ContainerDisplays";
 import { formatTime } from "../../utils/helpers";
 
 const Countdown = ({ id }: { id: string }) => {
@@ -24,8 +18,8 @@ const Countdown = ({ id }: { id: string }) => {
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = window.setInterval(() => {
-        updateTimerTimeLeft(id, timeLeft - 10);
-      }, 10);
+        updateTimerTimeLeft(id, timeLeft - 1000);
+      }, 1000);
     } else if (isRunning && timeLeft <= 0) {
       clearInterval(intervalRef.current!);
       updateTimerState(id, "completed");

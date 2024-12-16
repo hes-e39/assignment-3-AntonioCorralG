@@ -14,9 +14,22 @@ import { ButtonContainer, StyledButtonContainer } from '../components/generic/Co
 import EditTimerModal from '../components/modals/EditTimerModal';
 import { formatTime } from '../utils/helpers';
 
-
 const TimersView = () => {
-    const { timers, currentTimerIndex, isWorkoutRunning, startWorkout, pauseWorkout, resetWorkout, fastForward, savingTimerURLS, totalWorkoutTime, moveTimerDown, moveTimerUp } = useTimers();
+    const {
+        timers,
+        currentTimerIndex,
+        isWorkoutRunning,
+        startWorkout,
+        pauseWorkout,
+        resetWorkout,
+        fastForward,
+        savingTimerURLS,
+        totalWorkoutTime,
+        moveTimerDown,
+        moveTimerUp,
+        nextTimer
+    } = useTimers();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTimer, setEditingTimer] = useState<Timer | null>(null);
     const [timeLeft, setTimeLeft] = useState(totalWorkoutTime);
@@ -31,8 +44,8 @@ const TimersView = () => {
             intervalRef.current = window.setInterval(() => {
                 setTimeLeft(prevTime => {
                     if (prevTime <= 1000) {
-                        pauseWorkout();
                         clearInterval(intervalRef.current!);
+                        nextTimer();
                         return 0;
                     }
                     return prevTime - 1000;
@@ -70,7 +83,6 @@ const TimersView = () => {
     const handleMoveDownClick = (id: string) => {
         moveTimerDown(id);
     };
-
 
     const handleEditClick = (timer: Timer) => {
         setEditingTimer(timer);
@@ -138,3 +150,4 @@ const TimersView = () => {
 };
 
 export default TimersView;
+

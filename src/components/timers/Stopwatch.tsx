@@ -20,8 +20,8 @@ const Stopwatch = ({ id }: { id: string }) => {
   useEffect(() => {
     if (isRunning && timeLeft < targetTime) {
       intervalRef.current = window.setInterval(() => {
-        updateTimerTimeLeft(id, timeLeft + 10);
-      }, 10);
+        updateTimerTimeLeft(id, timeLeft + 1000);
+      }, 1000);
     } else if (isRunning && timeLeft >= targetTime) {
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
@@ -56,3 +56,4 @@ const Stopwatch = ({ id }: { id: string }) => {
 };
 
 export default Stopwatch;
+

@@ -23,12 +23,10 @@ const Tabata = ({ id }: { id: string }) => {
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       intervalRef.current = window.setInterval(() => {
-        updateTimerTimeLeft(id, timeLeft - 10);
-      }, 10);
+        updateTimerTimeLeft(id, timeLeft - 1000);
+      }, 1000);
     } else if (isRunning && timeLeft <= 0 && roundsLeft > 1) {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
+      clearInterval(intervalRef.current!);
       if (phase) {
         setPhase(false);
         updateTimerTimeLeft(id, initialRestTime);
@@ -39,9 +37,7 @@ const Tabata = ({ id }: { id: string }) => {
       }
       updateTimerState(id, "running");
     } else if (isRunning && timeLeft <= 0 && roundsLeft <= 1) {
-      if (intervalRef.current !== null) {
-        clearInterval(intervalRef.current);
-      }
+      clearInterval(intervalRef.current!);
       updateTimerState(id, "completed");
       nextTimer();
     }
