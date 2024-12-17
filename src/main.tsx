@@ -13,7 +13,7 @@ import { ErrorPage } from "./views/ErrorPageView";
 const PageIndex = () => {
   return (
     <TimerProvider>
-      <ErrorBoundary FallbackComponent={ErrorPage}>
+    {/* <ErrorBoundary FallbackComponent={ErrorPage}> */}
         <div>
           <h1>Assignment</h1>
           <ul>
@@ -32,7 +32,7 @@ const PageIndex = () => {
           </ul>
           <Outlet />
         </div>
-      </ErrorBoundary>
+      {/* </ErrorBoundary> */}
     </TimerProvider>
   );
 };
